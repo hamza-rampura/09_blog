@@ -1,13 +1,14 @@
 //Fetch DOM elements
 const todoInput = document.querySelector(".todo-input");
-const todoDate = document.querySelector(".todo-input-date");
 const todoButton = document.querySelector(".todo-button");
 const todoList = document.querySelector(".todo-container");
+const filterOption = document.querySelector(".filter-todo");
 
 //Event Listeners
 window.addEventListener("load", getTodos);
 todoButton.addEventListener("click", addTodo);
 todoList.addEventListener("click", deleteTodo);
+filterOption.addEventListener("click", filterTodo);
 
 //Functions
 
@@ -15,26 +16,23 @@ function addTodo(e) {
   //Prevent natural behaviour
   e.preventDefault();
 
-    if(todoInput.value == "" || todoDate.value == "") {
+    if(todoInput.value == "") {
         alert("Please fill all the fields");
     } 
     else {    
-        // Generate unique ID    
-        let unique = new Date().getTime();      
         // Create todo Obj 
         let newTodoObj = {
             userId: 1,
-            uid: unique,
+            id: new Date().getTime(),
             text: todoInput.value,
-            date: todoDate.value,
-            completion: false
+            completed: false
         }
         //Save to local
         saveLocalTodos(newTodoObj);
         //Create todo div
         let todoDiv = document.createElement("div");
         todoDiv.classList.add("todo");
-        todoDiv.setAttribute("id", newTodoObj.uid);
+        todoDiv.setAttribute("id", newTodoObj.id);
         //Create list
         let newTodo = document.createElement("div");
         newTodo.innerText = todoInput.value;
@@ -51,21 +49,10 @@ function addTodo(e) {
         trashButton.innerHTML = `<i class="fas fa-trash"></i>`;
         trashButton.classList.add("trash-btn");
         todoDiv.appendChild(trashButton);
-        //Create Date Text 
-        let newTodoDate = document.createElement("div");
-        newTodoDate.classList.add("todo-date");
-        newTodoDate.innerText = todoDate.value;
-        todoDate.value = "";
-        todoDiv.appendChild(newTodoDate);
         //attach final Todo at the top of the list
         todoList.insertBefore(todoDiv, todoList.firstChild);
     }
 }
-
-function sortByDate (a,b) {
-    return new Date(a.date).getTime() - new Date(b.date).getTime();
-}
-
 function updateTextTodo(target, value) {
     let todos;
     if (localStorage.getItem("todos") === null) {
@@ -74,18 +61,16 @@ function updateTextTodo(target, value) {
         todos = JSON.parse(localStorage.getItem("todos"));
     }
     todos.forEach((ele) => {
-        if(ele["uid"] == target) {
-            ele["text"] = value;
+        if(ele["id"] == target) {
+            ele["title"] = value;
         }
     })
-    todos.sort(sortByDate);
     localStorage.setItem("todos", JSON.stringify(todos));
 }
 
 function deleteTodo(e) {
     let item = e.target;
     let todo = item.parentElement;
-    let todoList = todo.parentElement;
     if (item.classList[0] === "trash-btn") {
         removeLocalTodos(todo.id);
         todo.remove();
@@ -117,7 +102,6 @@ function saveLocalTodos(todo) {
         todos = JSON.parse(localStorage.getItem("todos"));
     }
     todos.push(todo);
-    todos.sort(sortByDate);
     localStorage.setItem("todos", JSON.stringify(todos));
 }
 
@@ -130,13 +114,38 @@ function removeLocalTodos(toDeleteIndex) {
         todos = JSON.parse(localStorage.getItem("todos"));
     }
     todos.forEach((ele,index) => {
-        if(ele["uid"] == toDeleteIndex) {
+        if(ele["id"] == toDeleteIndex) {
             toDeleteIndex = index;
         }
     })
     todos.splice(toDeleteIndex, 1);
-    todos.sort(sortByDate);
     localStorage.setItem("todos", JSON.stringify(todos));
+}
+
+function filterTodo(e) {
+    const todos = todoList.childNodes;
+    console.log(todos)
+    todos.forEach(function(todo) {
+        console.log(todo)
+      switch (e.target.value) {
+        case "all":
+          todo.style.display = "flex";
+          break;
+        case "completed":
+          if (todo.classList.contains("completed")) {
+            todo.style.display = "flex";
+          } else {
+            todo.style.display = "none";
+          }
+          break;
+        case "uncompleted":
+          if (!todo.classList.contains("completed")) {
+            todo.style.display = "flex";
+          } else {
+            todo.style.display = "none";
+          }
+      }
+    });
 }
 
 
@@ -152,7 +161,7 @@ function getTodos() {
             } else {
                 todos = data;
                 todos = todos.slice(0,10) // limiting to 10 entries
-                localStorage.setItem("todos", JSON.stringify(todos));
+                localStorage.setItem("todos", JSON.stringify(todos)); // adding this to local storage for CRUD operations, not modifying the API
             }
             todos.forEach(function(todo, index) {
                 // let todoDiv = "";
@@ -160,7 +169,7 @@ function getTodos() {
                     //Create todo div
                     let todoDiv = document.createElement("div");
                     // todoDiv.classList.add("todo")
-                    todo.completed?todoDiv.classList.add("todo", "completed"):todoDiv.classList.add("todo");
+                    todo.completed ? todoDiv.classList.add("todo", "completed") : todoDiv.classList.add("todo"); // check if todo is completed
                     todoDiv.setAttribute("id", todo.id);
                     //Create list
                     let newTodo = document.createElement("div");
@@ -178,18 +187,12 @@ function getTodos() {
                     trashButton.innerHTML = `<i class="fas fa-trash"></i>`;
                     trashButton.classList.add("trash-btn");
                     todoDiv.appendChild(trashButton);
-                    //Create Date Text 
-                    let newTodoDate = document.createElement("div");
-                    newTodoDate.classList.add("todo-date");
-                    newTodoDate.innerText = todo.date;
-                    todoDate.value = "";
-                    todoDiv.appendChild(newTodoDate);
                     //attach final Todo at the top of the list
                     todoList.appendChild(todoDiv);
-                //attach final Todo        
-                // todoList.insertAdjacentHTML("beforeEnd", todoDiv);
             });
         }
     );
     
 }
+
+

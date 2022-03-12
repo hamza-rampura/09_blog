@@ -43,7 +43,8 @@ form :last-child {
 }
 
 form input,
-form button {
+form button,
+form select {
     padding: 0.5rem;
     font-size: 1.25rem;
     border: none;
@@ -53,25 +54,31 @@ form button {
     color: #fff;
 }
 
-form input:focus {
+form input:focus,
+form select:focus {
     outline: none;
-    border: 1px solid #fff;
+    /* border: 1px solid #fff; */
 }
 
 form input.todo-input {
     flex: 1;
 }
 
-form button {
+form button,
+form select {
   color: #fff;
   background: #222f3e;
   cursor: pointer;
   transition: all 0.3s ease;
 }
 
-::placeholder { /* Chrome, Firefox, Opera, Safari 10.1+ */
+form select {
+    height: 10vh;
+}
+
+::placeholder { 
     color: #fff;
-    opacity: 0.5; /* Firefox */
+    opacity: 0.5;
 }
 
 /* hotfix */
@@ -83,6 +90,10 @@ form button:hover {
   background: #feca57;
   color: white;
 }
+
+.filter-todo {
+    padding: 1rem;
+  }
 
 .todo-container {
     display: flex;
@@ -135,13 +146,6 @@ form button:hover {
     outline: none;
 }
 
-.todo .todo-date {
-    position: absolute;
-    color: #fff;
-    font-size: 1rem;
-    right: 0.25rem;
-    bottom: 0;
-}
 
 .trash-btn,
 .complete-btn {

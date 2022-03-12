@@ -23,13 +23,18 @@
         </header>
         <form>
           <input type="text" placeholder="Add a to do" class="todo-input" />
-          <input type="date" class="todo-input-date" />
           <button class="todo-button">
             <i class="fas fa-plus-square" type="submit"></i>
           </button>
+          <div class="select">
+            <select name="todos" class="filter-todo">
+              <option value="all">All</option>
+              <option value="completed">Completed</option>
+              <option value="uncompleted">Uncompleted</option>
+            </select>
+          </div>
         </form>
-        <div class="todo-container">
-        </div>
+        <div class="todo-container"></div>
     </div>
 
     <script src="../js/script.js"></script>
